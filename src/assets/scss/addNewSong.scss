@@ -1,0 +1,29 @@
+@import './color';
+
+.addNewSong {
+    .masonry-layout {
+        margin-top: 45px!important;
+
+        .categorie-title {
+            h3 {
+                span {
+                    color: $color!important;
+                }
+            }
+        }
+
+        .widget-form {
+            .form-group {
+                .custom-control {
+                    .custom-control-label {
+                        cursor: pointer;
+                    }
+                    .custom-control-label::before {
+                        background-color: #fea700;
+                        border-color: #fea700;
+                    }
+                }
+            }
+        }
+    }
+}

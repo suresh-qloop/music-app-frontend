@@ -1,0 +1,39 @@
+@import './color';
+
+.video {
+    .masonry-layout {
+        margin-top: 45px!important;
+
+        .categorie-title {
+            h3 {
+                span {
+                    color: $color!important;
+                }
+            }
+        }
+
+        .videosToday {
+            .card {
+                .post-card-image {
+                    margin-top: 0px;
+                    margin-bottom: 10px;
+                    border-radius: 0px!important;
+                    padding: 20px 0px;
+                    background-color: black;
+
+                    img {
+                        border-radius: 0px!important;
+                        height: 125px;
+                    }
+
+                    @media(max-width: 767px ) {
+                        img {
+                            border-radius: 0px!important;
+                            height: auto;
+                        }   
+                    }
+                }
+            }
+        }
+    }
+}

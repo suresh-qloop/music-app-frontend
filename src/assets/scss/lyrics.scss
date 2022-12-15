@@ -1,0 +1,39 @@
+@import "./color";
+
+.lyrics {
+  .masonry-layout {
+    margin-top: 45px !important;
+
+    .categorie-title {
+      h3 {
+        span {
+          color: $color !important;
+        }
+      }
+    }
+
+    .recent-card {
+      column-count: 2;
+    }
+
+    @media (max-width: 767px) {
+      .recent-card {
+        column-count: 1;
+      }
+    }
+
+    .widget-form {
+      .form-group {
+        .custom-control {
+          .custom-control-label {
+            cursor: pointer;
+          }
+          .custom-control-label::before {
+            background-color: #fea700;
+            border-color: #fea700;
+          }
+        }
+      }
+    }
+  }
+}

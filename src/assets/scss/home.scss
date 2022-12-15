@@ -1,0 +1,115 @@
+@import "./color";
+.text-red {
+  color: $color;
+}
+
+.home {
+  nav {
+    .active {
+      color: $color !important;
+    }
+  }
+  .masonry-layout {
+    margin-top: 45px !important;
+    .post-single-gallery {
+      .carousel {
+        .carousel-indicators {
+          bottom: 50px;
+          gap: 5px;
+
+          button {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            border: 1px solid white;
+            background-color: transparent;
+          }
+
+          .active {
+            background-color: $color;
+          }
+        }
+
+        .carousel-inner {
+          .carousel-item {
+            button {
+              position: absolute;
+              bottom: 86px;
+              right: 110px;
+              border-radius: 50%;
+              width: 40px;
+              height: 40px;
+              background-color: transparent;
+              border: none;
+            }
+          }
+        }
+
+        .carousel-control-next,
+        .carousel-control-prev {
+          span {
+            display: none;
+          }
+        }
+      }
+    }
+
+    .most-recent {
+      .card-columns {
+        .card {
+          .post-card {
+            padding: 15px 0px;
+
+            div {
+              padding: 10px 20px;
+              // border-bottom: 1px solid beige;
+              cursor: pointer;
+              transition: 0.2s linear;
+            }
+
+            div:hover {
+              color: $color;
+            }
+
+            .social-icones {
+              .list-inline {
+                display: flex;
+                justify-content: center;
+                gap: 1rem;
+                li {
+                  a {
+                    i {
+                      font-size: 30px;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .articles {
+      .card-columns {
+        .card {
+          .post-card {
+            img {
+              cursor: pointer;
+            }
+
+            .post-card-content {
+              cursor: pointer;
+            }
+
+            .post-card-content:hover {
+              h5 {
+                color: $color;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

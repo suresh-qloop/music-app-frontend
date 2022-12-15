@@ -1,0 +1,74 @@
+@import './color';
+
+.browse {
+    .masonry-layout {
+        margin-top: 45px!important;
+        .alphaOrder {
+            .list-inline {
+                cursor: pointer;
+                li {
+                    border-color: $color!important;
+
+                    a {
+                        text-transform: uppercase;
+                        color: $color!important;
+                    }
+                }
+                li:hover {
+                    a {
+                        color: white!important;
+                        background-color: transparent;
+                    }
+                    
+                    background-color: $color!important;
+                    border-color: $color!important;
+                }
+
+                li.active {
+                    a {
+                        color: white!important;
+                        background-color: transparent;
+                    }
+                    
+                    background-color: $color!important;
+                    border-color: $color!important;
+                }
+            }
+        }
+
+        .categorie-title {
+            h3 {
+                span {
+                    color: $color!important;
+                }
+            }
+        }
+
+        .artists {
+            .card {
+                .post-card-image {
+                    margin-top: 0px;
+                    margin-bottom: 10px;
+                }
+            }
+        }
+
+        .recent-card {
+            column-count: 2;
+        }
+
+        @media(max-width: 767px)  {
+            .recent-card {
+                column-count: 1;
+            }   
+        }
+
+        .widget {
+            .widget-categories {
+                li {
+                    padding: 10px 20px;
+                }
+            }
+        }
+    }
+}
