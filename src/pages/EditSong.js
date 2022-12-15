@@ -47,7 +47,7 @@ const EditSong = () => {
     // const RemoveList = [...removedLyrics];
     // console.log(RemoveList, "op");
     // RemoveList = item;
-    setRemovedLyrics([...removedLyrics, item.id]);
+    setRemovedLyrics([...removedLyrics, { id: item.id }]);
 
     const list = [...lyricsArray];
     list.splice(index, 1);

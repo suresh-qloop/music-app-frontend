@@ -23,13 +23,13 @@ const HighLyricsLine = (props) => {
     if (!(comment == undefined) && !(comment == "")) {
       let data = new FormData();
       data.append("author", author.id);
-      data.append("lineNumber", item.id);
+      data.append("line_number", item.id);
       data.append("song_id", item.song_id);
-      data.append("comment", comment);
+      data.append("explanation", comment);
       data.append("file", file);
 
       await axios
-        .post(`${Music_App_API_URL}/comment`, data)
+        .post(`${Music_App_API_URL}/add-explanation`, data)
         .then((res) => {
           console.log(res);
         })

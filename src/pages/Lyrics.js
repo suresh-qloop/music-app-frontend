@@ -56,7 +56,7 @@ const Lyrics = () => {
                   <span> {id} </span>
                 </h3>
                 <ul className="list-inline">
-                  <li className="">{songData?.views} viewsss</li>
+                  <li className="">{songData?.views} views</li>
                   <li className="dot"></li>
                   <li className="">
                     <Link to={`/edit-lyrics/${id}`}>Edit</Link>

@@ -35,8 +35,8 @@ const ResetPassword = () => {
         await axios
           .post(`${Music_App_API_URL}/resetpassword`, {
             author: author.id,
-            oldPassword: oldPassword,
-            newPassword: newPassword,
+            old_password: oldPassword,
+            new_password: newPassword,
           })
           .then((res) => {
             console.log(res);
