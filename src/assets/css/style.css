@@ -2847,3 +2847,15 @@ body.rtl {
   left: 0.5rem !important;
   border-right-color: red !important;
 }
+
+#img-none {
+  max-width: 100%;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+#img-none img {
+  display: none;
+}

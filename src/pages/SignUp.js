@@ -5,7 +5,7 @@ import { ModeContext } from "../context/ModeContext";
 import { Music_App_API_URL } from "../utils/globalVariables";
 
 const SignUp = () => {
-  const [usename, setUsername] = useState();
+  const [username, setUsername] = useState();
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const { setIsLogin } = useContext(ModeContext);
@@ -23,7 +23,7 @@ const SignUp = () => {
   const handleSubmit = async () => {
     await axios
       .post(`${Music_App_API_URL}/sign-up`, {
-        username: usename,
+        username: username,
         email: email,
         pwd: password,
         reg_date: 0,
@@ -59,7 +59,7 @@ const SignUp = () => {
                   className="form-control"
                   placeholder="Username*"
                   name="username"
-                  value={usename || ""}
+                  value={username || ""}
                   onChange={handleUsername}
                 />
               </div>

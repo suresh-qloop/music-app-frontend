@@ -9,40 +9,53 @@ import axios from "axios";
 import { Music_App_API_URL } from "../utils/globalVariables";
 import HighLyricsLine from "../components/HighLyricsLine";
 import ReactPlayer from "react-player";
+import Loading from "../components/Loading";
 
 const Lyrics = () => {
   const { id } = useParams();
   const { allArticles, allSongs } = useContext(ModeContext);
   const [songData, setSongData] = useState();
   const [lyricsArray, setLyricsArray] = useState();
+  const [songDetail, setSongDetail] = useState();
+  const [loading, setLoading] = useState(false);
 
-  console.log(songData, "songData");
+  // console.log(allSongs, "allSongs");
 
   useEffect(() => {
     getSongData();
-  }, [id]);
+  }, [allSongs]);
 
   useEffect(() => {
-    getLyricsData();
+    setLoading(true);
+    getAllData();
   }, [songData]);
 
   const getSongData = () => {
     const item = allSongs?.filter((data) => {
       return data.title === id;
     });
-    setSongData(item[0]);
+    if (item) {
+      setSongData(item[0]);
+    }
   };
 
-  const getLyricsData = async () => {
-    await axios
-      .post(`${Music_App_API_URL}/lyrics-lines`, { id: songData?.id })
-      .then((res) => {
-        setLyricsArray(res.data);
-        console.log(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  const getAllData = async () => {
+    if (songData?.id > 0) {
+      let data = new FormData();
+      data.append("id", songData?.id);
+
+      await axios
+        .post(`${Music_App_API_URL}/edit-song`, data)
+        .then((res) => {
+          setLoading(false);
+          setSongDetail(res.data.song_detail[0]);
+          setLyricsArray(res.data.lyrics_lines);
+          console.log(res.data, "allData");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   };
 
   return (
@@ -56,7 +69,7 @@ const Lyrics = () => {
                   <span> {id} </span>
                 </h3>
                 <ul className="list-inline">
-                  <li className="">{songData?.views} views</li>
+                  <li className="">{songDetail?.views} views</li>
                   <li className="dot"></li>
                   <li className="">
                     <Link to={`/edit-lyrics/${id}`}>Edit</Link>
@@ -67,20 +80,21 @@ const Lyrics = () => {
                 <div className="song-detail">
                   <div>
                     <h5>
-                      Genre: <b>{songData?.genre}</b>
+                      Genre: <b>{songDetail?.genre}</b>
                     </h5>
                   </div>
                   <div>
                     <h5>
-                      Album: <b>{songData?.album}</b>
+                      Album: <b>{songDetail?.album}</b>
                     </h5>
                   </div>
                   <div>
                     <h5>
-                      Year: <b>{songData?.year}</b>
+                      Year: <b>{songDetail?.year}</b>
                     </h5>
                   </div>
                 </div>
+                {loading && <Loading />}
                 <div className="Verse mt-5">
                   {lyricsArray?.map((item, index) => {
                     if (item.comment === "false") {

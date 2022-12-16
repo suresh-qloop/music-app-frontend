@@ -2,20 +2,26 @@ import { useContext, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import "../assets/scss/postDetail.scss";
 import Comment from "../components/Comment";
+import Loading from "../components/Loading";
 import TopWikimizikUser from "../components/TopWikimizikUser";
 import { ModeContext } from "../context/ModeContext";
 
 const Article = () => {
   const { id } = useParams();
   const [postData, setPostData] = useState("");
+  const [loading, setLoading] = useState(false);
   const { allArticles } = useContext(ModeContext);
 
   useEffect(() => {
+    setLoading(true);
     const item = allArticles?.filter((data) => {
       return data.title === id;
     });
-    setPostData(item[0]);
-  }, [id]);
+    if (item) {
+      setLoading(false);
+      setPostData(item[0]);
+    }
+  }, [allArticles]);
 
   return (
     <div className="post-detail">
@@ -24,6 +30,11 @@ const Article = () => {
           <div className="row">
             <div className="col-lg-8 mb-20">
               <div className="post-single">
+                {loading && (
+                  <div className="col-lg-12 mb-5">
+                    <Loading />
+                  </div>
+                )}
                 <div className="post-single-image text-center">
                   <img
                     src={
@@ -183,7 +194,7 @@ const Article = () => {
                           value="1"
                           required="required"
                         />
-                        <span>
+                        <span className="ml-2">
                           save my name , email and website in this browser for
                           the next time I comment.
                         </span>

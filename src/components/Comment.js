@@ -4,7 +4,7 @@ const Comment = (props) => {
   const { commentData } = props;
   return (
     <li className="comment-item">
-      <img src={commentData.img} alt="" />
+      <img src="/assets/images/users.png" alt="" />
       <div className="content">
         <ul className="info list-inline">
           <li>Mohammed Ali</li>

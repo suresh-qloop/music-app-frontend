@@ -10,6 +10,7 @@ import { Music_App_API_URL } from "../utils/globalVariables";
 
 const SearchResult = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [searchResult, setSearchResult] = useState();
   const alphArr = useState(genCharArray("a", "z"));
   const { allSongs } = useContext(ModeContext);
 
@@ -17,9 +18,10 @@ const SearchResult = () => {
 
   const getSearchResult = async () => {
     await axios
-      .post(`${Music_App_API_URL}/search?search_query=${query}`)
+      .get(`${Music_App_API_URL}/search-result?search_query=${query}`)
       .then((res) => {
         console.log(res.data);
+        setSearchResult(res.data);
       })
       .catch((err) => {
         console.log(err);
@@ -58,7 +60,7 @@ const SearchResult = () => {
                 </h3>
               </div>
               <ul className="widget-latest-posts">
-                {allSongs?.map((item, index) => {
+                {searchResult?.map((item, index) => {
                   if (index < 10) {
                     return (
                       <Fragment key={index}>
@@ -80,6 +82,7 @@ const SearchResult = () => {
                     );
                   }
                 })}
+                {}
               </ul>
             </div>
             <div className="col-md-4">

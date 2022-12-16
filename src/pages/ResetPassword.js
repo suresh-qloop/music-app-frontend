@@ -12,9 +12,8 @@ const ResetPassword = () => {
   const [newPasswordConf, setNewPasswordConf] = useState();
   const [error1, setError1] = useState(false);
   const [error2, setError2] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const { author } = useContext(ModeContext);
-
-  console.log(author);
 
   const navigate = useNavigate();
 
@@ -32,16 +31,18 @@ const ResetPassword = () => {
       !(newPasswordConf == "")
     ) {
       if (newPassword === newPasswordConf) {
+        let data = new FormData();
+        data.append("author", author.id);
+        data.append("old_password", oldPassword);
+        data.append("new_password", newPassword);
         await axios
-          .post(`${Music_App_API_URL}/resetpassword`, {
-            author: author.id,
-            old_password: oldPassword,
-            new_password: newPassword,
-          })
+          .post(`${Music_App_API_URL}/reset-password`, data)
           .then((res) => {
             console.log(res);
+            navigate(`/profile/${author.id}`);
           })
           .catch((err) => {
+            setErrorMessage(err.response.data.error);
             console.log(err);
           });
       } else {
@@ -72,6 +73,9 @@ const ResetPassword = () => {
               {error2 && (
                 <p className="text-danger">Please fill data properly</p>
               )}
+              {errorMessage != "" && (
+                <p className="text-danger">{errorMessage}</p>
+              )}
 
               <form className="mb-5 widget-form">
                 <div className="form-group">
@@ -88,6 +92,7 @@ const ResetPassword = () => {
                       setOldPassword(e.target.value);
                       setError1(false);
                       setError2(false);
+                      setErrorMessage("");
                     }}
                   />
                 </div>
@@ -104,6 +109,7 @@ const ResetPassword = () => {
                       setNewPassword(e.target.value);
                       setError1(false);
                       setError2(false);
+                      setErrorMessage("");
                     }}
                   />
                 </div>
@@ -120,6 +126,7 @@ const ResetPassword = () => {
                       setNewPasswordConf(e.target.value);
                       setError1(false);
                       setError2(false);
+                      setErrorMessage("");
                     }}
                   />
                 </div>

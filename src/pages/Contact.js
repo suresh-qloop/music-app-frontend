@@ -16,15 +16,18 @@ const Contact = () => {
 
   const ContactForm = async (e) => {
     e.preventDefault();
+    const data = new FormData();
+    data.append("name", name);
+    data.append("email", email);
+    data.append("subject", subject);
+    data.append("message", message);
+
     await axios
-      .post(`${Music_App_API_URL}/contact-data`, {
-        name: name,
-        email: email,
-        subject: subject,
-        message: message,
-      })
+      .post(`${Music_App_API_URL}/contact`, data)
       .then((res) => {
         console.log(res);
+        alert(res.data.message);
+        document.getElementById("main_contact_form").reset();
       })
       .catch((err) => {
         console.log(err);

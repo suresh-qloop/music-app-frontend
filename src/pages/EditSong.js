@@ -4,7 +4,8 @@ import { Fragment, useContext, useEffect, useState } from "react";
 import { ModeContext } from "../context/ModeContext";
 import axios from "axios";
 import { Music_App_API_URL } from "../utils/globalVariables";
-import { useNavigate, useParams } from "react-router-dom";
+import { json, useNavigate, useParams } from "react-router-dom";
+import Loading from "../components/Loading";
 
 const EditSong = () => {
   const { id } = useParams();
@@ -25,13 +26,9 @@ const EditSong = () => {
   const [lyricsArray, setLyricsArray] = useState([]);
   const [lyrics, setLyrics] = useState([]);
   const [removedLyrics, setRemovedLyrics] = useState([]);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  console.log(lyricsArray, "lyricsArray");
-
-  // console.log(lyrics, "Lyrics");
-
-  console.log(removedLyrics, "removedLyrics");
   // ARRAY EDIT CHANGES
   const handleLyricsArrayChange = (e, index) => {
     const { name, value } = e.target;
@@ -73,6 +70,9 @@ const EditSong = () => {
     setLyrics([...lyrics, { line_txt: "" }]);
   };
 
+  // console.log(allSongs, "allSongs");
+  // console.log(songData, "songData");
+
   useEffect(() => {
     getSongData();
   }, [allSongs]);
@@ -98,7 +98,6 @@ const EditSong = () => {
     if (item) {
       setSongData(item[0]);
     }
-    // console.log(item[0], "ADD");
   };
 
   const genreDatas = [
@@ -128,30 +127,39 @@ const EditSong = () => {
   };
 
   const update_song_func = async () => {
+    const data = {
+      id: songData.id,
+      title: songTitle,
+      artist: artist,
+      feat_artist: featuredArtist,
+      producer: producer,
+      lyrics_by: lyricsBy,
+      album: album,
+      year: year,
+      genre: genre,
+      youtube_url: youtubeURL,
+      soundcloud_url: soundCloundURL,
+      spotify_url: spotifyURL,
+      video: selectOption,
+      author: author.id,
+      totalPoints: author.total_pts,
+      lyrics_to_edit: lyricsArray,
+    };
+    if (lyrics.length > 0) {
+      data.lyrics_to_add = lyrics;
+    }
+    if (removedLyrics.length > 0) {
+      data.lyrics_to_remove = removedLyrics;
+    }
+
+    // console.log(data2);
+
     await axios
-      .post(`${Music_App_API_URL}/update-song-test`, {
-        id: songData.id,
-        title: songTitle,
-        artist: artist,
-        feat_artist: featuredArtist,
-        producer: producer,
-        lyrics_by: lyricsBy,
-        album: album,
-        year: year,
-        genre: genre,
-        youtube_url: youtubeURL,
-        soundcloud_url: soundCloundURL,
-        spotify_url: spotifyURL,
-        video: selectOption,
-        author: author.id,
-        totalPoints: author.total_pts,
-        lyrics_to_edit: lyricsArray,
-        lyrics_to_add: lyrics,
-        lyrics_to_remove: removedLyrics,
-      })
+      .post(`${Music_App_API_URL}/update-song`, data)
       .then((res) => {
+        console.log(res);
         if (res.data === 1) {
-          alert("Updated Success!");
+          navigate(`/lyrics/${id}`);
         } else {
           alert("Please try to update song");
         }
@@ -161,38 +169,41 @@ const EditSong = () => {
       });
   };
 
-  const getLyricsData = async () => {
-    await axios
-      .post(`${Music_App_API_URL}/lyrics-lines`, { id: songData?.id })
-      .then((res) => {
-        setLyricsArray(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
   useEffect(() => {
-    getLyricsData();
-  }, [songData?.id]);
+    setLoading(true);
+    getAllData();
+  }, [songData]);
 
-  useEffect(() => {
-    if (id) {
-      setSongTitle(songData?.title);
-      setArtist(songData?.artist);
-      setFeaturedArtist(songData?.feat_artist);
-      setProducer(songData?.producer);
-      setLyricsBy(songData?.lyrics_by);
-      setAlbum(songData?.album);
-      setYear(songData?.year);
-      setGenre(songData?.genre);
-      setSpotifyURL(songData?.spotify_url);
-      setYoutubeURL(songData?.youtube_url);
-      setSoundCloundURL(songData?.soundcloud_url);
-      setSelectOption(songData?.video);
-    } else {
-      console.log("Add Lyrics");
+  const getAllData = async () => {
+    if (songData?.id > 0) {
+      let data = new FormData();
+      data.append("id", songData?.id);
+
+      await axios
+        .post(`${Music_App_API_URL}/edit-song`, data)
+        .then((res) => {
+          setLoading(false);
+          setSongTitle(res.data.song_detail[0].title);
+          setArtist(res.data.song_detail[0].artist);
+          setFeaturedArtist(res.data.song_detail[0].feat_artist);
+          setProducer(res.data.song_detail[0].producer);
+          setLyricsBy(res.data.song_detail[0].lyrics_by);
+          setAlbum(res.data.song_detail[0].album);
+          setYear(res.data.song_detail[0].year);
+          setGenre(res.data.song_detail[0].genre);
+          setSpotifyURL(res.data.song_detail[0].spotify_url);
+          setYoutubeURL(res.data.song_detail[0].youtube_url);
+          setSoundCloundURL(res.data.song_detail[0].soundcloud_url);
+          setSelectOption(res.data.song_detail[0].video);
+
+          setLyricsArray(res.data.lyrics_lines);
+          console.log(res.data, "allData");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
-  }, [allSongs]);
+  };
 
   return (
     <div className="addNewSong">
@@ -202,288 +213,290 @@ const EditSong = () => {
             <div className="col-md-8">
               <div className="categorie-title">
                 <h3>
-                  <span> {id ? "Edit Songss" : "Add New Song"} </span>
+                  <span>Edit Song</span>
                 </h3>
               </div>
-
-              <form className="mb-5 widget-form">
-                <div className="form-group">
-                  <label htmlFor="song_title">
-                    <b>Song Title</b>
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="song_title"
-                    placeholder="Song Title *"
-                    value={songTitle}
-                    // value={!id ? songTitle : songData?.title}
-                    onChange={(e) => {
-                      setSongTitle(e.target.value);
-                    }}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="artist">
-                    <b>Artist</b>
-                  </label>
-                  <select
-                    className="form-control"
-                    name="genre"
-                    style={{ padding: "8px 20px", height: "46px" }}
-                    onChange={(e) => {
-                      setArtist(e.target.value);
-                    }}
-                    value={artist}
-                  >
-                    {distinctSongs?.map((data, index) => {
-                      if (index < 150) {
-                        return (
-                          <Fragment key={index}>
-                            <option key={index}>{data.artist}</option>
-                          </Fragment>
-                        );
-                      }
-                    })}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="featured_artist">
-                    <b>Featured Artist</b>
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="featured_artist"
-                    placeholder="Featured Artist *"
-                    value={featuredArtist}
-                    onChange={(e) => {
-                      setFeaturedArtist(e.target.value);
-                    }}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="producer">
-                    <b>Producer</b>
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="producer"
-                    placeholder="Producer *"
-                    value={producer}
-                    onChange={(e) => {
-                      setProducer(e.target.value);
-                    }}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="lyricsBy">
-                    <b>Lyrics By</b>
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="lyricsBy"
-                    placeholder="Lyrics By *"
-                    value={lyricsBy}
-                    onChange={(e) => {
-                      setLyricsBy(e.target.value);
-                    }}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="album">
-                    <b>Album</b>
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="album"
-                    placeholder="Album *"
-                    value={album}
-                    onChange={(e) => {
-                      setAlbum(e.target.value);
-                    }}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="year">
-                    <b>Year</b>
-                  </label>
-                  <select
-                    className="form-control"
-                    id="year"
-                    style={{ padding: "8px 20px", height: "46px" }}
-                    onChange={(e) => {
-                      setYear(e.target.value);
-                    }}
-                    value={year}
-                  >
-                    {yearsHandle()}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="genre">
-                    <b>Genre</b>
-                  </label>
-                  <select
-                    className="form-control"
-                    name="genre"
-                    style={{ padding: "8px 20px", height: "46px" }}
-                    onChange={(e) => {
-                      setGenre(e.target.value);
-                    }}
-                    value={genre}
-                  >
-                    {genreDatas.map((data, index) => {
-                      return <option key={index}>{data}</option>;
-                    })}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="soundCloudURL">
-                    <b>SoundCloud URL</b>
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="soundCloudURL"
-                    placeholder="SoundCloud URL *"
-                    value={soundCloundURL}
-                    onChange={(e) => {
-                      setSoundCloundURL(e.target.value);
-                    }}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="spotifyURL">
-                    <b>Spotify URL</b>
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="spotifyURL"
-                    placeholder="Spotify URL *"
-                    value={spotifyURL}
-                    onChange={(e) => {
-                      setSpotifyURL(e.target.value);
-                    }}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="youtubeURL">
-                    <b>You Tube URL</b>
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="youtubeURL"
-                    placeholder="You Tube URL *"
-                    value={youtubeURL}
-                    onChange={(e) => {
-                      setYoutubeURL(e.target.value);
-                    }}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>
-                    <b>This You Tube video is the:</b>
-                  </label>
-                  <br />
-                  <div className="ml-5 custom-control custom-checkbox">
-                    <input
-                      type="radio"
-                      id="video-track"
-                      className="custom-control-input"
-                      value="true"
-                      onChange={handleOptionChange}
-                      checked={selectOption === "true"}
-                    />
-                    <label
-                      htmlFor="video-track"
-                      className="custom-control-label"
-                    >
-                      Official video of the song
+              {loading ? (
+                <Loading />
+              ) : (
+                <form className="mb-5 widget-form">
+                  <div className="form-group">
+                    <label htmlFor="song_title">
+                      <b>Song Title</b>
                     </label>
-                  </div>
-                  <div className="ml-5 custom-control custom-checkbox">
                     <input
-                      type="radio"
-                      id="audio-track"
-                      className="custom-control-input"
-                      value="false"
-                      onChange={handleOptionChange}
-                      checked={selectOption === "false"}
+                      type="text"
+                      className="form-control"
+                      id="song_title"
+                      placeholder="Song Title *"
+                      value={songTitle}
+                      // value={!id ? songTitle : songData?.title}
+                      onChange={(e) => {
+                        setSongTitle(e.target.value);
+                      }}
                     />
-                    <label
-                      htmlFor="audio-track"
-                      className="custom-control-label"
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="artist">
+                      <b>Artist</b>
+                    </label>
+                    <select
+                      className="form-control"
+                      name="genre"
+                      style={{ padding: "8px 20px", height: "46px" }}
+                      onChange={(e) => {
+                        setArtist(e.target.value);
+                      }}
+                      value={artist}
                     >
-                      Audio track of the song
+                      {distinctSongs?.map((data, index) => {
+                        if (index < 150) {
+                          return (
+                            <Fragment key={index}>
+                              <option key={index}>{data.artist}</option>
+                            </Fragment>
+                          );
+                        }
+                      })}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="featured_artist">
+                      <b>Featured Artist</b>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="featured_artist"
+                      placeholder="Featured Artist *"
+                      value={featuredArtist}
+                      onChange={(e) => {
+                        setFeaturedArtist(e.target.value);
+                      }}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="producer">
+                      <b>Producer</b>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="producer"
+                      placeholder="Producer *"
+                      value={producer}
+                      onChange={(e) => {
+                        setProducer(e.target.value);
+                      }}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="lyricsBy">
+                      <b>Lyrics By</b>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="lyricsBy"
+                      placeholder="Lyrics By *"
+                      value={lyricsBy}
+                      onChange={(e) => {
+                        setLyricsBy(e.target.value);
+                      }}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="album">
+                      <b>Album</b>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="album"
+                      placeholder="Album *"
+                      value={album}
+                      onChange={(e) => {
+                        setAlbum(e.target.value);
+                      }}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="year">
+                      <b>Year</b>
+                    </label>
+                    <select
+                      className="form-control"
+                      id="year"
+                      style={{ padding: "8px 20px", height: "46px" }}
+                      onChange={(e) => {
+                        setYear(e.target.value);
+                      }}
+                      value={year}
+                    >
+                      {yearsHandle()}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="genre">
+                      <b>Genre</b>
+                    </label>
+                    <select
+                      className="form-control"
+                      name="genre"
+                      style={{ padding: "8px 20px", height: "46px" }}
+                      onChange={(e) => {
+                        setGenre(e.target.value);
+                      }}
+                      value={genre}
+                    >
+                      {genreDatas.map((data, index) => {
+                        return <option key={index}>{data}</option>;
+                      })}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="soundCloudURL">
+                      <b>SoundCloud URL</b>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="soundCloudURL"
+                      placeholder="SoundCloud URL *"
+                      value={soundCloundURL}
+                      onChange={(e) => {
+                        setSoundCloundURL(e.target.value);
+                      }}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="spotifyURL">
+                      <b>Spotify URL</b>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="spotifyURL"
+                      placeholder="Spotify URL *"
+                      value={spotifyURL}
+                      onChange={(e) => {
+                        setSpotifyURL(e.target.value);
+                      }}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="youtubeURL">
+                      <b>You Tube URL</b>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="youtubeURL"
+                      placeholder="You Tube URL *"
+                      value={youtubeURL}
+                      onChange={(e) => {
+                        setYoutubeURL(e.target.value);
+                      }}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>
+                      <b>This You Tube video is the:</b>
                     </label>
                     <br />
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label>
-                    <b>Lyrics</b>
-                  </label>
-                  <br />
-                  <small>
-                    <i>
-                      if you don't want a line to be able ot receive
-                      annotations, put it between a pair of brackets "[]"
-                    </i>
-                    <br />
-                    <i>
-                      For example: [Verse 2], [Chorus], [Piano lead], [Refrain],
-                      [x2], [Richie]
-                    </i>
-                  </small>
-                  <br />
-                  {lyricsArray?.map((singleLyrics, index) => (
-                    <div key={index} className="services row">
-                      <div className="col-8 my-3">
-                        <input
-                          name="line_txt"
-                          className="form-control "
-                          type="text"
-                          id="line_txt"
-                          value={singleLyrics.line_txt}
-                          onChange={(e) => handleLyricsArrayChange(e, index)}
-                          required
-                        />
-                      </div>
-                      <div className="col-4 my-3">
-                        {lyricsArray.length !== 1 && (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleLyricsArrayRemove(index, singleLyrics)
-                            }
-                            className="btn btn-danger"
-                          >
-                            <span>Remove</span>
-                          </button>
-                        )}
-                      </div>
+                    <div className="ml-5 custom-control custom-checkbox">
+                      <input
+                        type="radio"
+                        id="video-track"
+                        className="custom-control-input"
+                        value="true"
+                        onChange={handleOptionChange}
+                        checked={selectOption === "true"}
+                      />
+                      <label
+                        htmlFor="video-track"
+                        className="custom-control-label"
+                      >
+                        Official video of the song
+                      </label>
                     </div>
-                  ))}
-                  {lyrics?.map((singleLyrics, index) => (
-                    <div key={index} className="services row">
-                      <div className="col-8 my-3">
-                        <input
-                          name="line_txt"
-                          className="form-control "
-                          type="text"
-                          id="line_txt"
-                          value={singleLyrics.line_txt}
-                          onChange={(e) => handleLyricsChange(e, index)}
-                          required
-                        />
-                        {/* {lyrics.length === index && (
+                    <div className="ml-5 custom-control custom-checkbox">
+                      <input
+                        type="radio"
+                        id="audio-track"
+                        className="custom-control-input"
+                        value="false"
+                        onChange={handleOptionChange}
+                        checked={selectOption === "false"}
+                      />
+                      <label
+                        htmlFor="audio-track"
+                        className="custom-control-label"
+                      >
+                        Audio track of the song
+                      </label>
+                      <br />
+                    </div>
+                  </div>
+                  <div className="form-group">
+                    <label>
+                      <b>Lyrics</b>
+                    </label>
+                    <br />
+                    <small>
+                      <i>
+                        if you don't want a line to be able ot receive
+                        annotations, put it between a pair of brackets "[]"
+                      </i>
+                      <br />
+                      <i>
+                        For example: [Verse 2], [Chorus], [Piano lead],
+                        [Refrain], [x2], [Richie]
+                      </i>
+                    </small>
+                    <br />
+                    {lyricsArray?.map((singleLyrics, index) => (
+                      <div key={index} className="services row">
+                        <div className="col-8 my-3">
+                          <input
+                            name="line_txt"
+                            className="form-control "
+                            type="text"
+                            id="line_txt"
+                            value={singleLyrics.line_txt}
+                            onChange={(e) => handleLyricsArrayChange(e, index)}
+                            required
+                          />
+                        </div>
+                        <div className="col-4 my-3">
+                          {lyricsArray.length !== 1 && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleLyricsArrayRemove(index, singleLyrics)
+                              }
+                              className="btn btn-danger"
+                            >
+                              <span>Remove</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                    {lyrics?.map((singleLyrics, index) => (
+                      <div key={index} className="services row">
+                        <div className="col-8 my-3">
+                          <input
+                            name="line_txt"
+                            className="form-control "
+                            type="text"
+                            id="line_txt"
+                            value={singleLyrics.line_txt}
+                            onChange={(e) => handleLyricsChange(e, index)}
+                            required
+                          />
+                          {/* {lyrics.length === index && (
                           <button
                             type="button"
                             onClick={handleLyricsAdd}
@@ -492,38 +505,39 @@ const EditSong = () => {
                             <span>Add a Lyrics</span>
                           </button>
                         )} */}
+                        </div>
+                        <div className="col-4 my-3">
+                          {lyrics.length !== 0 && (
+                            <button
+                              type="button"
+                              onClick={() => handleLyricsRemove(index)}
+                              className="btn btn-danger"
+                            >
+                              <span>Remove</span>
+                            </button>
+                          )}
+                        </div>
                       </div>
-                      <div className="col-4 my-3">
-                        {lyrics.length !== 0 && (
-                          <button
-                            type="button"
-                            onClick={() => handleLyricsRemove(index)}
-                            className="btn btn-danger"
-                          >
-                            <span>Remove</span>
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                  {lyricsArray.length > 1 && (
+                    ))}
+                    {/* {lyricsArray.length > 1 && ( */}
                     <button
                       type="button"
                       onClick={handleLyricsAdd}
                       className="btn btn-primary mt-3"
                     >
-                      <span>Add a Lyrics</span>
+                      <span>Add New Line</span>
                     </button>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  className="btn-custom"
-                  onClick={handleSubmit}
-                >
-                  Submit
-                </button>
-              </form>
+                    {/* )} */}
+                  </div>
+                  <button
+                    type="button"
+                    className="btn-custom"
+                    onClick={handleSubmit}
+                  >
+                    Submit
+                  </button>
+                </form>
+              )}
             </div>
             <div className="col-md-4">
               <TopWikimizikUser />

@@ -3,6 +3,7 @@ import TopWikimizikUser from "../components/TopWikimizikUser";
 import { ModeContext } from "../context/ModeContext";
 import "../assets/scss/profile.scss";
 import { Link, useParams } from "react-router-dom";
+import Loading from "../components/Loading";
 
 const Profile = () => {
   const { id } = useParams();
@@ -10,14 +11,19 @@ const Profile = () => {
   const [authorSongs, setAuthorSongs] = useState();
   const [showCount, setShowCount] = useState(6);
   const [showMoreTxt, setShowMoreTxt] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [user, setUser] = useState();
 
   useEffect(() => {
+    setLoading(true);
     const item = allUsers?.filter((data) => {
       return data.id == id;
     });
-    setUser(item[0]);
-  }, [id]);
+    if (item) {
+      setLoading(false);
+      setUser(item[0]);
+    }
+  }, [allSongs]);
 
   useEffect(() => {
     const items = [];
@@ -27,7 +33,7 @@ const Profile = () => {
       }
     });
     setAuthorSongs(items);
-  }, []);
+  }, [user]);
 
   const handleShowMode = () => {
     if (!showMoreTxt) {
@@ -141,6 +147,11 @@ const Profile = () => {
                     );
                   }
                 })}
+                {loading && (
+                  <div className="col-lg-12 mb-5">
+                    <Loading />
+                  </div>
+                )}
                 <div className="col-md-12">
                   <button className="form-control" onClick={handleShowMode}>
                     {!showMoreTxt ? "Show More" : "Less more"}

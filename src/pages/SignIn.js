@@ -21,7 +21,7 @@ const SignIn = () => {
     await axios
       .post(`${Music_App_API_URL}/sign-in`, { email: username, pwd: password })
       .then((res) => {
-        console.log(res.data);
+        console.log(res);
         if (res.data) {
           setIsLogin(true);
           navigate("/");

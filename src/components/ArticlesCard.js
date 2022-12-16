@@ -35,10 +35,11 @@ const ArticlesCard = (props) => {
           <h5>
             <Link to={`/${data.title}`}>{data.title}</Link>
           </h5>
-          <p>{data.body.substring(0, 300)}...</p>
-          {/* <p
+          {/* <p>{data.body.substring(0, 300)}...</p> */}
+          <p
+            id="img-none"
             dangerouslySetInnerHTML={{ __html: data.body.substring(0, 300) }}
-          ></p> */}
+          ></p>
         </div>
       </div>
     </div>

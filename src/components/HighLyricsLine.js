@@ -26,7 +26,9 @@ const HighLyricsLine = (props) => {
       data.append("line_number", item.id);
       data.append("song_id", item.song_id);
       data.append("explanation", comment);
-      data.append("file", file);
+      if (file !== undefined) {
+        data.append("file", file);
+      }
 
       await axios
         .post(`${Music_App_API_URL}/add-explanation`, data)
@@ -65,7 +67,7 @@ const HighLyricsLine = (props) => {
 
             <Form.Control
               onChange={(e) => {
-                console.log(e.target.files[0]);
+                // console.log(e.target.files[0]);
                 setFile(e.target.files[0]);
               }}
               type="file"

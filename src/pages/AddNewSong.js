@@ -416,7 +416,7 @@ const AddNewSong = () => {
                             onClick={handleServiceAdd}
                             className="btn btn-primary mt-3"
                           >
-                            <span>Add a Lyrics</span>
+                            <span>Add New Line</span>
                           </button>
                         )}
                       </div>
